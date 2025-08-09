@@ -57,5 +57,12 @@
     <script src="//s7.addthis.com/js/300/addthis_widget.js#pubid={{ theme.add_this_id }}" async="async"></script>
   </div>
 {%- endif %}
+{%- if true %}
+  <span class="post-meta-divider">|</span>
+  <span class="post-meta-item-icon">
+    <i class="fa fa-user-md"></i>
+  </span>
+  Visitors: <span id="busuanzi_value_site_uv"></span>
+{%- endif %}
 
 {{- next_inject('footer') }}
