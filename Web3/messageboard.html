@@ -1,0 +1,589 @@
+123 <span id=more></span><!doctype html><html lang=en><meta charset=UTF-8><meta content="width=device-width,initial-scale=1.0" name=viewport><title>MessageBoard DApp</title><script src=https://cdnjs.cloudflare.com/ajax/libs/web3/1.8.0/web3.min.js></script><style>* {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      .message-body {
+        font-family: 'Arial', sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .message-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+      }
+
+      .message-header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .message-header h1 {
+        color: #333;
+        font-size: 2.5em;
+        margin-bottom: 10px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .network-info {
+        background: linear-gradient(45deg, #4caf50, #45a049);
+        color: white;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .wallet-section {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 25px;
+        border-left: 4px solid #667eea;
+      }
+
+      .contract-section {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 25px;
+        border-left: 4px solid #764ba2;
+      }
+
+      .message-section {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 25px;
+        border-left: 4px solid #ff6b6b;
+      }
+
+      .query-section {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        border-left: 4px solid #4ecdc4;
+      }
+
+      .input-group {
+        margin-bottom: 15px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #555;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e1e1e1;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: border-color 0.3s ease;
+      }
+
+      input:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      button {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        margin: 5px;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+      }
+
+      button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .status {
+        padding: 10px;
+        border-radius: 6px;
+        margin: 10px 0;
+        font-weight: bold;
+      }
+
+      .status.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .status.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .status.info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+
+      .messages-list {
+        max-height: 300px;
+        overflow-y: auto;
+        background: white;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 15px;
+      }
+
+      .message-item {
+        background: #f8f9fa;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 6px;
+        border-left: 3px solid #667eea;
+      }
+
+      .message-meta {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 5px;
+      }
+
+      .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 10px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .section-title {
+        font-size: 1.2em;
+        margin-bottom: 15px;
+        color: #333;
+        display: flex;
+        align-items: center;
+      }
+
+      .section-title::before {
+        content: '';
+        width: 4px;
+        height: 20px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        margin-right: 10px;
+        border-radius: 2px;
+      }</style><body class=message-body><div class=message-container><div class=message-header><h1>MessageBoard DApp</h1><p>基于以太坊 Sepolia 测试网的留言板</div><div class=network-info><strong>网络：</strong> Ethereum Sepolia Testnest <br><strong>Gas 费用：</strong> 请确保钱包有足够的 SepoliaETH</div><!-- 钱包连接部分 --><div class=wallet-section><div class=section-title>钱包连接</div><button id=connectBtn onclick=connectWallet()>连接以太坊钱包</button><button style="background: linear-gradient(45deg, #4caf50, #45a049)" id=detectBtn onclick=detectWallet()>检测可用钱包</button><div class="status info" id=walletStatus>请先连接以太坊兼容钱包(MetaMask, Trust Wallet, Coinbase Wallet 等)</div><div style="margin-top: 10px" id=walletList></div></div><!-- 合约配置部分 --><div class=contract-section><div class=section-title>合约配置</div><div class=input-group><label for=contractAddress>合约地址：</label><input id=contractAddress placeholder=请输入你的合约地址(0x...)></div><button disabled id=contractBtn onclick=setContract()>设置合约</button><div class="status info" id=contractStatus>请输入合约地址</div></div><!-- 发送留言部分 --><div class=message-section><div class=section-title>发送留言</div><div class=input-group><label for=messageInput>留言内容：</label><textarea id=messageInput placeholder=请输入你的留言... row=3></textarea></div><button disabled id=sendBtn onclick=leaveMessage()>发送留言</button><div id=sendStatus></div></div><!-- 查询留言部分 --><div class=query-section><div class=section-title>查询留言</div><div class=input-group><label for=queryAddress>查询地址：</label><input id=queryAddress placeholder=输入地址(0x...)或留空查询自己的留言></div><div><button disabled id=queryBtn onclick=queryMessages()>查询留言</button><button onclick=queryMyMessages()>查询我的留言</button></div><div id=queryStatus></div><div style="display: none" class=messages-list id=messageList></div></div></div><script>let web3
+      let account
+      let contract
+
+      const connectBtnEl = document.getElementById('connectBtn')
+      const detectBtnEl = document.getElementById('detectBtn')
+      const walletStatusEl = document.getElementById('walletStatus')
+      const walletListEl = document.getElementById('walletList')
+      const contractAddressEl = document.getElementById('contractAddress')
+      const contractBtnEl = document.getElementById('contractBtn')
+      const contractStatusEl = document.getElementById('contractStatus')
+      const messageInputEl = document.getElementById('messageInput')
+      const sendBtnEl = document.getElementById('sendBtn')
+      const sendStatusEl = document.getElementById('sendStatus')
+      const queryAddressEl = document.getElementById('queryAddress')
+      const queryBtnEl = document.getElementById('queryBtn')
+      const queryStatusEl = document.getElementById('queryStatus')
+      const messageListEl = document.getElementById('messageList')
+
+      function getWalletTypes(ethereum) {
+        if (ethereum.isMetaMask) {
+          return 'MetaMask'
+        }
+        if (ethereum.isCoinbaseWallet) {
+          return 'Coinbase Wallet'
+        }
+        if (ethereum.isTrust) {
+          return 'Trust Wallet'
+        }
+        if (ethereum.isImToken) {
+          return 'imToken'
+        }
+      }
+
+      const contractABI = [
+        { inputs: [], stateMutability: 'nonpayable', type: 'constructor' },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: 'address',
+              name: 'sender',
+              type: 'address',
+            },
+            {
+              indexed: false,
+              internalType: 'string',
+              name: 'message',
+              type: 'string',
+            },
+          ],
+          name: 'NewMessage',
+          type: 'event',
+        },
+        {
+          inputs: [
+            { internalType: 'address', name: 'user', type: 'address' },
+            { internalType: 'uint256', name: 'index', type: 'uint256' },
+          ],
+          name: 'getMessage',
+          outputs: [{ internalType: 'string', name: '', type: 'string' }],
+          stateMutability: 'view',
+          type: 'function',
+        },
+        {
+          inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
+          name: 'getMessageCount',
+          outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+          stateMutability: 'view',
+          type: 'function',
+        },
+        {
+          inputs: [{ internalType: 'string', name: '_msg', type: 'string' }],
+          name: 'leaveMessage',
+          outputs: [],
+          stateMutability: 'nonpayable',
+          type: 'function',
+        },
+        {
+          inputs: [
+            { internalType: 'address', name: '', type: 'address' },
+            { internalType: 'uint256', name: '', type: 'uint256' },
+          ],
+          name: 'messages',
+          outputs: [{ internalType: 'string', name: '', type: 'string' }],
+          stateMutability: 'view',
+          type: 'function',
+        },
+      ]
+
+      // 检查可用钱包
+      function detectWallet() {
+        console.log('window.ethereum ', window.ethereum)
+
+        let walletList = []
+        let listHtml = ''
+
+        if (typeof window.ethereum !== 'undefined') {
+          if (window.ethereum.isMetaMask) {
+            walletList.push('MetaMask')
+          }
+          if (window.ethereum.isCoinbaseWallet) {
+            walletList.push('Coinbase Wallet')
+          }
+          if (window.ethereum.isTrust) {
+            walletList.push('Trust Wallet')
+          }
+          if (window.ethereum.isImToken) {
+            walletList.push('imToken')
+          }
+          if (walletList.length === 0) {
+            walletList.push('以太坊兼容钱包')
+          }
+        }
+
+        if (typeof window.phantom !== 'undefined') {
+          listHtml +=
+            '<div class="status error">检测到 Phantom 钱包 (Solana)，但此DApp需要以太坊钱包</div>'
+        }
+
+        if (walletList.length > 0) {
+          listHtml +=
+            '<div class="status success">检测到以太坊钱包: ' +
+            walletList.join(', ') +
+            '</div>'
+        } else {
+          listHtml +=
+            '<div class="status error">未检测到以太坊钱包，请安装 MetaMask, Trust Wallet 或其他以太坊钱包</div>'
+        }
+
+        walletListEl.innerHTML = listHtml
+      }
+
+      // 连接钱包
+      async function connectWallet() {
+        if (window.ethereum !== 'undefined') {
+          try {
+            connectBtnEl.innerHTML = '<span class="loading"></span>连接中...'
+
+            const accounts = await window.ethereum.request({
+              method: 'eth_requestAccounts',
+            })
+            web3 = new Web3(window.ethereum)
+            account = accounts[0]
+
+            // 检查网络
+            const chainId = await web3.eth.getChainId()
+            if (chainId !== 11155111) {
+              // Sepolia chainId
+              walletStatusEl.innerHTML =
+                '<span class="status error">请切换到 Sepolia 测试网络！当前链ID: ' +
+                chainId +
+                '</span>'
+              connectBtnEl.innerHTML = '连接以太坊钱包'
+              return
+            }
+
+            // 获取钱包类型
+            let walletType = '以太坊钱包'
+
+            walletType = getWalletTypes(window.ethereum)
+
+            walletStatusEl.innerHTML =
+              '<span class="status success">已连接 ' +
+              walletType +
+              ': ' +
+              account.substring(0, 10) +
+              '...</span>'
+
+            connectBtnEl.innerHTML = '已连接'
+            connectBtnEl.disabled = true
+            contractBtnEl.disabled = false
+
+            // 监听账户变化
+            window.ethereum.on('accountsChanged', function (accounts) {
+              if (accounts.length === 0) {
+                location.reload()
+              } else {
+                account = accounts[0]
+                walletStatusEl.innerHTML =
+                  '<span class="status success">已连接 ' +
+                  walletType +
+                  ': ' +
+                  account.substring(0, 10) +
+                  '...</span>'
+              }
+            })
+          } catch (error) {
+            walletStatusEl.innerHTML =
+              '<span class="status error">连接失败: ' +
+              error.message +
+              '</span>'
+
+            connectBtnEl.innerHTML = '连接以太坊钱包'
+          }
+        } else {
+          let errorMsg = '未检测到以太坊钱包'
+          if (typeof window.phantom !== 'undefined') {
+            errorMsg +=
+              '<br>检测到 Phantom (Solana钱包)，但此DApp需要以太坊钱包'
+          }
+          errorMsg += '<br>请安装: MetaMask, Trust Wallet, Coinbase Wallet 等'
+
+          walletStatusEl.innerHTML =
+            '<span class="status error">' + errorMsg + '</span>'
+        }
+      }
+
+      // 设置合约
+      function setContract() {
+        const address = contractAddressEl.value.trim()
+        if (!address) {
+          contractStatusEl.innerHTML =
+            '<span class="status error">请输入合约地址</span>'
+          return
+        }
+
+        if (!web3.utils.isAddress(address)) {
+          contractStatusEl.innerHTML =
+            '<span class="status error">请输入有效的合约地址</span>'
+          return
+        }
+
+        try {
+          contract = new web3.eth.Contract(contractABI, address)
+          contractStatusEl.innerHTML =
+            '<span class="status success">合约已设置: ' +
+            address.substring(0, 10) +
+            '...</span>'
+
+          sendBtnEl.disabled = false
+          queryBtnEl.disabled = false
+        } catch (error) {
+          contractStatusEl.innerHTML =
+            '<span class="status error">合约设置失败: ' +
+            error.message +
+            '</span>'
+        }
+      }
+
+      // 发送留言
+      async function leaveMessage() {
+        const message = messageInputEl.value.trim()
+        if (!message) {
+          sendStatusEl.innerHTML =
+            '<span class="status error">请输入留言内容</span>'
+          return
+        }
+
+        if (!contract) {
+          sendStatusEl.innerHTML =
+            '<span class="status error">请先设置合约地址</span>'
+          return
+        }
+
+        try {
+          sendBtnEl.innerHTML = '<span class="loading"></span>发送中...'
+          sendBtnEl.disabled = true
+
+          const tx = await contract.methods
+            .leaveMessage(message)
+            .send({ from: account })
+
+          sendStatusEl.innerHTML =
+            '<div class="status success"><p>留言发送成功!</p><br>交易哈希: <a href="https://sepolia.etherscan.io/tx/' +
+            tx.transactionHash +
+            '" target="_blank">' +
+            tx.transactionHash.substring(0, 20) +
+            '...</a></div>'
+
+          messageInputEl.value = ''
+        } catch (error) {
+          sendStatusEl.innerHTML =
+            '<span class="status error">发送失败: ' + error.message + '</span>'
+        } finally {
+          sendBtnEl.innerHTML = '发送留言'
+          sendBtnEl.disabled = false
+        }
+      }
+
+      // 查询留言
+      async function queryMessages() {
+        const address = queryAddressEl.value.trim() || account
+
+        if (!address) {
+          queryStatusEl.innerHTML =
+            '<div class="status error">请输入查询地址或先连接钱包</div>'
+          return
+        }
+
+        if (!contract) {
+          queryStatusEl.innerHTML =
+            '<div class="status error">请先设置合约地址</div>'
+          return
+        }
+
+        try {
+          queryStatusEl.innerHTML =
+            '<div class="status info"><span class="loading"></span>查询中...</div>'
+
+          const count = await contract.methods.getMessageCount(address).call()
+
+          if (count === 0) {
+            queryStatusEl.innerHTML =
+              '<div class="status info">该地址还没有留言</div>'
+            messageListEl.style.display = 'none'
+            return
+          }
+
+          let messageHtml = ''
+          for (let i = 0; i < count; i++) {
+            const message = await contract.methods.getMessage(address, i).call()
+            messageHtml += `
+            <div class="message-item">
+              <div class="message-meta">
+                第 ${i + 1} 条留言 | 地址: ${address.substring(0, 10)}...
+              </div>
+              <div>${message}</div>
+            </div>
+            `
+          }
+
+          messageListEl.innerHTML = messageHtml
+          messageListEl.style.display = 'block'
+          queryStatusEl.innerHTML =
+            '<div class="status success">查询成功，共找到 ' +
+            count +
+            ' 条留言</div>'
+        } catch (error) {
+          queryStatusEl.innerHTML =
+            '<div class="status error">查询失败: ' + error.message + '</div>'
+        }
+      }
+
+      // 查询我自己的留言
+      async function queryMyMessages() {
+        if (!account) {
+          queryStatusEl.innerHTML =
+            '<div class="status error">请先连接钱包</div>'
+          return
+        }
+
+        queryAddressEl.value = account
+        await queryMessages()
+      }
+
+      // 页面加载时检查是否已连接钱包
+      window.addEventListener('load', async () => {
+        if (typeof window.ethereum !== 'undefined') {
+          try {
+            const accounts = await window.ethereum.request({
+              method: 'eth_accounts',
+            })
+            if (accounts.length > 0) {
+              web3 = new Web3(window.ethereum)
+              account = accounts[0]
+
+              const chainId = await web3.eth.getChainId()
+              if (chainId === 11155111) {
+                walletStatusEl.innerHTML =
+                  '<span class="status success">已连接: ' +
+                  account.substring(0, 10) +
+                  '...</span>'
+                connectBtnEl.innerHTML = '已连接'
+                connectBtnEl.disabled = true
+                contractBtnEl.disabled = false
+              }
+            }
+          } catch (error) {
+            console.log('检查钱包连接状态失败:', error)
+          }
+        }
+      })</script>
